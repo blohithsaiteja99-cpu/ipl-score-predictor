@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>IPL Score Predictor</title>
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="overlay"></div>
+
+    <div class="container">
+
+        <!-- LEFT SIDE -->
+
+        <div class="left-section">
+
+            <h1>🏏 IPL SCORE PREDICTOR</h1>
+
+            <p>
+                Predict IPL scores using Machine Learning
+                with real-time live cricket match integration.
+            </p>
+
+            <div class="feature-box">
+
+                <div class="feature-card">
+                    <h2>ML</h2>
+                    <span>Powered</span>
+                </div>
+
+                <div class="feature-card">
+                    <h2>LIVE</h2>
+                    <span>Scores</span>
+                </div>
+
+                <div class="feature-card">
+                    <h2>FAST</h2>
+                    <span>Prediction</span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+
+        <div class="right-section">
+
+            <div class="form-box">
+
+                <h2>Match Details</h2>
+
+                <form action="/predict" method="POST">
+
+                    <input type="text" name="venue"
+                        placeholder="Venue" required>
+
+                    <input type="text" name="bat_team"
+                        placeholder="Batting Team" required>
+
+                    <input type="text" name="bowl_team"
+                        placeholder="Bowling Team" required>
+
+                    <div class="row">
+
+                        <input type="number" name="runs"
+                            placeholder="Runs" required>
+
+                        <input type="number" name="wickets"
+                            placeholder="Wickets" required>
+
+                    </div>
+
+                    <div class="row">
+
+                        <input type="number" step="0.1"
+                            name="overs"
+                            placeholder="Overs" required>
+
+                        <input type="number"
+                            name="runs_last_5"
+                            placeholder="Runs Last 5" required>
+
+                    </div>
+
+                    <div class="row">
+
+                        <input type="number"
+                            name="wickets_last_5"
+                            placeholder="Wickets Last 5" required>
+
+                        <input type="number"
+                            name="striker"
+                            placeholder="Striker Runs" required>
+
+                    </div>
+
+                    <input type="number"
+                        name="non_striker"
+                        placeholder="Non-Striker Runs" required>
+
+                    <button type="submit">
+                        Predict Score 🚀
+                    </button>
+
+                </form>
+
+                <div class="prediction">
+
+                    <h3>{{ prediction_text }}</h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- LIVE MATCHES -->
+
+    <div class="live-container">
+
+        <h1>🏏 Live Cricket Matches</h1>
+
+        <div class="live-grid">
+
+            {% for match in live_matches %}
+
+            <div class="live-card">
+
+                <h2>{{ match.name }}</h2>
+
+                <p>{{ match.status }}</p>
+
+                {% if match.score %}
+
+                    {% for s in match.score %}
+
+                    <div class="score-box">
+
+                        <h3>{{ s.inning }}</h3>
+
+                        <p>
+                            {{ s.r }}/{{ s.w }}
+                            ({{ s.o }} Overs)
+                        </p>
+
+                    </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
