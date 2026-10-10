@@ -1,4 +1,5 @@
 import os
+import sys
 from flask import Flask, render_template, request
 import pandas as pd
 import joblib
@@ -6,19 +7,43 @@ import requests
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# Robust resolution for templates and static folders on Vercel
+def find_dir(name):
+    for candidate in [
+        os.path.join(BASE_DIR, name),
+        os.path.join(os.getcwd(), name),
+        os.path.join(BASE_DIR, '..', name)
+    ]:
+        if os.path.isdir(candidate):
+            return candidate
+    return os.path.join(BASE_DIR, name)
+
 app = Flask(
     __name__,
-    template_folder=os.path.join(BASE_DIR, 'templates'),
-    static_folder=os.path.join(BASE_DIR, 'static')
+    template_folder=find_dir('templates'),
+    static_folder=find_dir('static')
 )
 
-# Load ML Model
-MODEL_PATH = os.path.join(BASE_DIR, 'score_predictor.pkl')
-model = joblib.load(MODEL_PATH)
+# Robust resolution for score_predictor.pkl
+def load_model():
+    candidates = [
+        os.path.join(BASE_DIR, 'score_predictor.pkl'),
+        os.path.join(os.getcwd(), 'score_predictor.pkl'),
+        os.path.join(BASE_DIR, '..', 'score_predictor.pkl'),
+        os.path.join(os.getcwd(), 'api', 'score_predictor.pkl'),
+        os.path.join(BASE_DIR, 'api', 'score_predictor.pkl')
+    ]
+    for p in candidates:
+        if os.path.isfile(p):
+            return joblib.load(p)
+    raise FileNotFoundError(f"score_predictor.pkl could not be found. Checked: {candidates}")
+
+model = load_model()
 
 # CricAPI Key
 API_KEY = os.getenv("CRICAPI_KEY", "2538a5f-cf9a-4236-a847-cf945518d0c0")
 LIVE_URL = f"https://api.cricapi.com/v1/currentMatches?apikey={API_KEY}&offset=0"
+
 
 @app.route('/')
 def home():
